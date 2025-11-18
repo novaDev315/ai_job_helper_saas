@@ -1,0 +1,163 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionTier {
+  FREE
+  PRO
+  PREMIUM
+  ENTERPRISE
+}
+
+enum ApplicationStatus {
+  APPLIED
+  INTERVIEW
+  OFFER
+  REJECTED
+  WITHDRAWN
+}
+
+model User {
+  id                String            @id @default(uuid())
+  email             String            @unique
+  name              String?
+  clerkId           String?           @unique
+  subscriptionTier  SubscriptionTier  @default(FREE)
+  stripeCustomerId  String?           @unique
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  resumes           Resume[]
+  jobApplications   JobApplication[]
+  coverLetters      CoverLetter[]
+  interviewPreps    InterviewPrep[]
+  usageStats        UsageStats?
+
+  @@map("users")
+}
+
+model Resume {
+  id                 String    @id @default(uuid())
+  userId             String
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title              String
+  originalContent    String    @db.Text
+  optimizedContent   String?   @db.Text
+  atsScore           Int?
+  version            Int       @default(1)
+  fileUrl            String?
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  coverLetters       CoverLetter[]
+  jobApplications    JobApplication[]
+
+  @@map("resumes")
+}
+
+model JobApplication {
+  id              String             @id @default(uuid())
+  userId          String
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resumeId        String?
+  resume          Resume?            @relation(fields: [resumeId], references: [id])
+
+  company         String
+  position        String
+  jobDescription  String?            @db.Text
+  jobUrl          String?
+  location        String?
+  salary          String?
+  status          ApplicationStatus  @default(APPLIED)
+  appliedDate     DateTime           @default(now())
+  notes           String?            @db.Text
+
+  nextFollowUp    DateTime?
+  interviewDate   DateTime?
+
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  coverLetters    CoverLetter[]
+  interviewPreps  InterviewPrep[]
+
+  @@map("job_applications")
+}
+
+model CoverLetter {
+  id                String          @id @default(uuid())
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resumeId          String?
+  resume            Resume?         @relation(fields: [resumeId], references: [id])
+  jobApplicationId  String?
+  jobApplication    JobApplication? @relation(fields: [jobApplicationId], references: [id])
+
+  content           String          @db.Text
+  tone              String?         // formal, creative, casual
+  aiGenerated       Boolean         @default(true)
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@map("cover_letters")
+}
+
+model InterviewPrep {
+  id                String          @id @default(uuid())
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobApplicationId  String?
+  jobApplication    JobApplication? @relation(fields: [jobApplicationId], references: [id])
+
+  questions         Json            // Array of {question, answer, tips}
+  companyResearch   String?         @db.Text
+  practiceNotes     String?         @db.Text
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@map("interview_preps")
+}
+
+model UsageStats {
+  id                     String   @id @default(uuid())
+  userId                 String   @unique
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  cvOptimizationsUsed    Int      @default(0)
+  coverLettersGenerated  Int      @default(0)
+  applicationsTracked    Int      @default(0)
+  interviewPrepsUsed     Int      @default(0)
+
+  lastResetDate          DateTime @default(now())
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@map("usage_stats")
+}
+
+model Subscription {
+  id                String            @id @default(uuid())
+  stripeSubscriptionId String         @unique
+  userId            String
+  tier              SubscriptionTier
+  status            String            // active, canceled, past_due
+  currentPeriodEnd  DateTime
+  cancelAtPeriodEnd Boolean           @default(false)
+
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@map("subscriptions")
+}
