@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, FileText, Briefcase, MessageSquare, Target, Settings, Sparkles } from "lucide-react";
+import { LayoutDashboard, FileText, Briefcase, MessageSquare, Target, Settings, Sparkles, CreditCard } from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -75,6 +75,11 @@ const navItems = [
     label: "Interview Prep",
     href: "/dashboard/interview",
     icon: Target,
+  },
+  {
+    label: "Billing",
+    href: "/dashboard/billing",
+    icon: CreditCard,
   },
   {
     label: "Settings",

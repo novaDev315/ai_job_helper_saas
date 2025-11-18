@@ -9,6 +9,8 @@ import { CvModule } from './cv/cv.module';
 import { JobsModule } from './jobs/jobs.module';
 import { CoverLetterModule } from './cover-letter/cover-letter.module';
 import { InterviewModule } from './interview/interview.module';
+import { EmailModule } from './email/email.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { InterviewModule } from './interview/interview.module';
     JobsModule,
     CoverLetterModule,
     InterviewModule,
+    EmailModule,
+    StripeModule,
   ],
 })
 export class AppModule {}
