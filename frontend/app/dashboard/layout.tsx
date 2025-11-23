@@ -1,11 +1,32 @@
+"use client";
+
 import Link from "next/link";
-import { LayoutDashboard, FileText, Briefcase, MessageSquare, Target, Settings, Sparkles, CreditCard } from "lucide-react";
+import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard,
+  FileText,
+  Briefcase,
+  MessageSquare,
+  Target,
+  Settings,
+  Sparkles,
+  CreditCard,
+  Linkedin,
+  TrendingUp,
+  Search,
+  FileStack,
+  DollarSign,
+} from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { cn } from "@/lib/utils";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
@@ -19,13 +40,44 @@ export default function DashboardLayout({
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent"
+              className={cn(
+                "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent",
+                pathname === item.href && "bg-accent text-accent-foreground"
+              )}
             >
               <item.icon className="h-5 w-5" />
               <span>{item.label}</span>
+              {item.badge && (
+                <span className="ml-auto rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
+                  {item.badge}
+                </span>
+              )}
             </Link>
           ))}
         </nav>
+
+        {/* Sidebar Footer - New Features */}
+        <div className="border-t p-4">
+          <p className="mb-2 text-xs font-medium text-muted-foreground">NEW FEATURES</p>
+          <nav className="space-y-1">
+            {newFeatures.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent",
+                  pathname === item.href && "bg-accent text-accent-foreground"
+                )}
+              >
+                <item.icon className="h-5 w-5" />
+                <span>{item.label}</span>
+                <span className="ml-auto rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700 dark:bg-green-900 dark:text-green-300">
+                  New
+                </span>
+              </Link>
+            ))}
+          </nav>
+        </div>
       </aside>
 
       {/* Main Content */}
@@ -36,6 +88,7 @@ export default function DashboardLayout({
             <h1 className="text-xl font-semibold">Welcome back!</h1>
           </div>
           <div className="flex items-center space-x-4">
+            <ThemeToggle />
             <Link href="/dashboard/settings" className="text-sm hover:text-primary">
               Settings
             </Link>
@@ -62,6 +115,11 @@ const navItems = [
     icon: FileText,
   },
   {
+    label: "Resume Templates",
+    href: "/dashboard/templates",
+    icon: FileStack,
+  },
+  {
     label: "Applications",
     href: "/dashboard/applications",
     icon: Briefcase,
@@ -85,5 +143,28 @@ const navItems = [
     label: "Settings",
     href: "/dashboard/settings",
     icon: Settings,
+  },
+];
+
+const newFeatures = [
+  {
+    label: "LinkedIn Optimizer",
+    href: "/dashboard/linkedin",
+    icon: Linkedin,
+  },
+  {
+    label: "Skills Gap Analyzer",
+    href: "/dashboard/skills",
+    icon: TrendingUp,
+  },
+  {
+    label: "Job Matcher",
+    href: "/dashboard/job-matcher",
+    icon: Search,
+  },
+  {
+    label: "Salary Insights",
+    href: "/dashboard/salary",
+    icon: DollarSign,
   },
 ];
