@@ -4,6 +4,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { PrismaModule } from './common/prisma/prisma.module';
+import { CommonModule } from './common/common.module';
 import { AuthModule } from './auth/auth.module';
 import { CvModule } from './cv/cv.module';
 import { JobsModule } from './jobs/jobs.module';
@@ -25,6 +26,7 @@ import { StripeModule } from './stripe/stripe.module';
       context: ({ req, res }) => ({ req, res }),
     }),
     PrismaModule,
+    CommonModule,
     AuthModule,
     CvModule,
     JobsModule,
